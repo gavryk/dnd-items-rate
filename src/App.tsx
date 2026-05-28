@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from './assets/vite.svg';
-import heroImg from './assets/hero.png';
 import './App.css';
+import { UIDraggable } from './components';
 
-function App() {
-	const [count, setCount] = useState(0);
+const defaultDraggbles = [{ id: crypto.randomUUID(), src: 'GoldenCard.png' }];
 
-	return <></>;
+export default function App() {
+	const [draggables, setDraggables] = useState(defaultDraggbles);
+
+	return (
+		<div className="w-screen h-screen flex justify-center items-center">
+			<div className="flex gap-2">
+				{draggables.map((draggable) => (
+					<UIDraggable key={draggable.id} item={draggable} />
+				))}
+			</div>
+		</div>
+	);
 }
-
-export default App;
