@@ -5,4 +5,5 @@ export interface DraggableProps {
 export type DraggbleItem = {
 	id: string;
 	src: string;
+	dz?: string;
 };
