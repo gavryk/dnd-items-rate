@@ -1,5 +1,6 @@
 export interface DraggableProps {
 	item: DraggbleItem;
+	isDragging?: boolean;
 }
 
 export type DraggbleItem = {

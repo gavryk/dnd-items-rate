@@ -1,13 +1,15 @@
 import React from 'react';
 import { DraggableProps } from '@/common';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { DraggableContent } from './ui/DraggableContent';
 
 export const UIDraggable: React.FC<DraggableProps> = ({ item }) => {
-	const { id, src } = item;
-	const { setNodeRef, listeners, attributes, transform } = useDraggable({ id });
+	const { id } = item;
+	const { setNodeRef, listeners, attributes, transform, transition } = useSortable({ id });
 
 	const style = {
 		transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+		transition,
 	};
 
 	return (
@@ -18,7 +20,7 @@ export const UIDraggable: React.FC<DraggableProps> = ({ item }) => {
 			{...listeners}
 			{...attributes}
 		>
-			<img src={`/src/assets/${src}`} alt="" className="max-h-30 aspect-[0.833] object-cover" />
+			<DraggableContent item={item} />
 		</button>
 	);
 };

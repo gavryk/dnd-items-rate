@@ -2,8 +2,17 @@ import { useState } from 'react';
 import './App.css';
 import { UIDraggable } from '@/components';
 import { DraggbleItem } from '@/common';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import {
+	DndContext,
+	DragEndEvent,
+	DragOverEvent,
+	DragOverlay,
+	DragStartEvent,
+} from '@dnd-kit/core';
 import { UIDropZone } from '@/components/ui-drop-zone';
+import { arrayMove } from '@dnd-kit/sortable';
+import { useAtom } from 'jotai';
+import { activeDraggableAtom } from './store/dnd';
 
 const defaultDraggbles: DraggbleItem[] = [
 	{ id: crypto.randomUUID(), src: 'BabyDragonCard.png', dz: undefined },
@@ -33,29 +42,47 @@ const defaultDraggbles: DraggbleItem[] = [
 
 export default function App() {
 	const [draggables, setDraggables] = useState<DraggbleItem[]>(defaultDraggbles);
+	const [activeDraggable, setActiveDraggable] = useAtom(activeDraggableAtom);
+
+	const handleDragStart = (e: DragStartEvent) => {
+		const activeDraggable = draggables.find((draggable) => draggable.id === e.active.id);
+		setActiveDraggable(activeDraggable);
+	};
+
+	const handleDragOver = (e: DragOverEvent) => {
+		if (!e.over) return;
+		const overId = e.over.id as string;
+		const activeDraggableId = e.active.id as string;
+		setDraggables((prev) => {
+			const oldIndx = prev.findIndex((draggable) => draggable.id === activeDraggableId);
+			const newIndx = prev.findIndex((draggable) => draggable.id === overId);
+
+			if (oldIndx === newIndx) return prev;
+
+			return arrayMove(prev, oldIndx, newIndx);
+		});
+	};
 
 	const handleDragEnd = (e: DragEndEvent) => {
-		if (!e.over) return;
-		const dropZoneId = e.over.id as string;
-		const activeDraggableId = e.active.id as string;
-		setDraggables((prev) =>
-			prev.map((draggable) =>
-				draggable.id !== activeDraggableId ? draggable : { ...draggable, dz: dropZoneId },
-			),
-		);
+		setActiveDraggable(undefined);
 	};
 
 	return (
 		<div className="w-screen h-screen flex flex-col gap-15 justify-center items-center">
-			<DndContext onDragEnd={handleDragEnd}>
+			<DndContext
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+				onDragOver={handleDragOver}
+			>
 				<UIDropZone draggables={draggables} />
-				<div className="flex gap-2">
+				{/* <div className="flex gap-2">
 					{draggables
 						.filter((draggable) => !draggable.dz)
 						.map((draggable) => (
 							<UIDraggable key={draggable.id} item={draggable} />
 						))}
-				</div>
+				</div> */}
+				<DragOverlay>{activeDraggable && <UIDraggable item={activeDraggable} />}</DragOverlay>
 			</DndContext>
 		</div>
 	);
