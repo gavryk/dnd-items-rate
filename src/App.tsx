@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 import { UIDraggable } from '@/components';
-import { DraggbleItem } from '@/common';
+import { DraggbleItem, DropZoneTP } from '@/common';
 import {
 	DndContext,
 	DragEndEvent,
@@ -12,36 +12,11 @@ import {
 import { UIDropZone } from '@/components/ui-drop-zone';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useAtom } from 'jotai';
-import { activeDraggableAtom } from './store/dnd';
-
-const defaultDraggbles: DraggbleItem[] = [
-	{ id: crypto.randomUUID(), src: 'BabyDragonCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'BarbariansCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'BomberCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'DarkPrinceCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'ElectroDragonCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'ElixirGolemCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'FireballCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'GiantCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'GiantSkeletonCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'GolemCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'GuardsCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'HogRiderCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'KnightCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'MegaKnight.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'MinerCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'PEKKACard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'RagingPrinceCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'RocketCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'RoyalGiantCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'SkeletonsCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'SpearGoblinsCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'TowerPrincessCard.png', dz: undefined },
-	{ id: crypto.randomUUID(), src: 'WizardCard.png', dz: undefined },
-];
+import { activeDraggableAtom, draggablesAtom, dropZonesAtom } from './store/dnd';
 
 export default function App() {
-	const [draggables, setDraggables] = useState<DraggbleItem[]>(defaultDraggbles);
+	const [draggables, setDraggables] = useAtom(draggablesAtom);
+	const [dropZones, setDropZones] = useAtom(dropZonesAtom);
 	const [activeDraggable, setActiveDraggable] = useAtom(activeDraggableAtom);
 
 	const handleDragStart = (e: DragStartEvent) => {
@@ -92,14 +67,9 @@ export default function App() {
 				onDragEnd={handleDragEnd}
 				onDragOver={handleDragOver}
 			>
-				<UIDropZone draggables={draggables} />
-				<SortableContext items={freeDraggables.map((dragable) => dragable.id)}>
-					<div className="flex gap-2">
-						{freeDraggables.map((draggable) => (
-							<UIDraggable key={draggable.id} item={draggable} />
-						))}
-					</div>
-				</SortableContext>
+				{dropZones.map((dz) => (
+					<UIDropZone dropZone={dz} />
+				))}
 				<DragOverlay>{activeDraggable && <UIDraggable item={activeDraggable} />}</DragOverlay>
 			</DndContext>
 		</div>
