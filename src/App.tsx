@@ -15,11 +15,11 @@ import { useAtom } from 'jotai';
 import { activeDraggableAtom } from './store/dnd';
 
 const defaultDraggbles: DraggbleItem[] = [
-	{ id: crypto.randomUUID(), src: 'BabyDragonCard.png', dz: 'dropZone' },
-	{ id: crypto.randomUUID(), src: 'BarbariansCard.png', dz: 'dropZone' },
-	{ id: crypto.randomUUID(), src: 'BomberCard.png', dz: 'dropZone' },
-	{ id: crypto.randomUUID(), src: 'DarkPrinceCard.png', dz: 'dropZone' },
-	{ id: crypto.randomUUID(), src: 'ElectroDragonCard.png', dz: 'dropZone' },
+	{ id: crypto.randomUUID(), src: 'BabyDragonCard.png', dz: undefined },
+	{ id: crypto.randomUUID(), src: 'BarbariansCard.png', dz: undefined },
+	{ id: crypto.randomUUID(), src: 'BomberCard.png', dz: undefined },
+	{ id: crypto.randomUUID(), src: 'DarkPrinceCard.png', dz: undefined },
+	{ id: crypto.randomUUID(), src: 'ElectroDragonCard.png', dz: undefined },
 	{ id: crypto.randomUUID(), src: 'ElixirGolemCard.png', dz: undefined },
 	{ id: crypto.randomUUID(), src: 'FireballCard.png', dz: undefined },
 	{ id: crypto.randomUUID(), src: 'GiantCard.png', dz: undefined },
