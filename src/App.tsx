@@ -10,7 +10,7 @@ import {
 	DragStartEvent,
 } from '@dnd-kit/core';
 import { UIDropZone } from '@/components/ui-drop-zone';
-import { arrayMove } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useAtom } from 'jotai';
 import { activeDraggableAtom } from './store/dnd';
 
@@ -50,22 +50,40 @@ export default function App() {
 	};
 
 	const handleDragOver = (e: DragOverEvent) => {
-		if (!e.over) return;
+		if (!e.over || !activeDraggable) return;
 		const overId = e.over.id as string;
 		const activeDraggableId = e.active.id as string;
 		setDraggables((prev) => {
+			//if we're hovering the empty space in a DropZone
+			if (overId === 'dropZone') {
+				const newDraggable = { ...activeDraggable, dz: 'dropZone' };
+
+				return [...prev.filter((draggable) => draggable.id !== activeDraggableId), newDraggable];
+			}
+
+			// If we're hovering the space inside a SortableContext
+			const overDraggable = prev.find((draggable) => draggable.id === overId);
+			const overDropZone = !!overDraggable?.dz;
 			const oldIndx = prev.findIndex((draggable) => draggable.id === activeDraggableId);
 			const newIndx = prev.findIndex((draggable) => draggable.id === overId);
 
 			if (oldIndx === newIndx) return prev;
 
-			return arrayMove(prev, oldIndx, newIndx);
+			const shiftedItems = arrayMove(prev, oldIndx, newIndx);
+			shiftedItems[newIndx] = {
+				...shiftedItems[newIndx],
+				dz: overDropZone ? 'dropZone' : undefined,
+			};
+
+			return shiftedItems;
 		});
 	};
 
 	const handleDragEnd = (e: DragEndEvent) => {
 		setActiveDraggable(undefined);
 	};
+
+	const freeDraggables = draggables.filter((draggable) => !draggable.dz);
 
 	return (
 		<div className="w-screen h-screen flex flex-col gap-15 justify-center items-center">
@@ -75,13 +93,13 @@ export default function App() {
 				onDragOver={handleDragOver}
 			>
 				<UIDropZone draggables={draggables} />
-				<div className="flex gap-2">
-					{draggables
-						.filter((draggable) => !draggable.dz)
-						.map((draggable) => (
+				<SortableContext items={freeDraggables.map((dragable) => dragable.id)}>
+					<div className="flex gap-2">
+						{freeDraggables.map((draggable) => (
 							<UIDraggable key={draggable.id} item={draggable} />
 						))}
-				</div>
+					</div>
+				</SortableContext>
 				<DragOverlay>{activeDraggable && <UIDraggable item={activeDraggable} />}</DragOverlay>
 			</DndContext>
 		</div>
